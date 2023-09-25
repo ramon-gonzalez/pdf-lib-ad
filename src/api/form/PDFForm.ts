@@ -548,6 +548,9 @@ export default class PDFForm {
       for (let j = 0, lenWidgets = widgets.length; j < lenWidgets; j++) {
         const widget = widgets[j];
         const page = this.findWidgetPage(widget);
+        if (page === undefined) {
+          continue;
+        }
         const widgetRef = this.findWidgetAppearanceRef(field, widget);
 
         const xObjectKey = page.node.newXObject('FlatWidget', widgetRef);
@@ -587,6 +590,9 @@ export default class PDFForm {
       const widgetRef = this.findWidgetAppearanceRef(field, widget);
 
       const page = this.findWidgetPage(widget);
+      if (page === undefined) {
+        continue;
+      }
       pages.add(page);
 
       page.node.removeAnnot(widgetRef);
@@ -698,7 +704,7 @@ export default class PDFForm {
     return this.defaultFontCache.access();
   }
 
-  private findWidgetPage(widget: PDFWidgetAnnotation): PDFPage {
+  private findWidgetPage(widget: PDFWidgetAnnotation): PDFPage| undefined {
     const pageRef = widget.P();
     let page = this.doc.getPages().find((x) => x.ref === pageRef);
     if (page === undefined) {
@@ -710,7 +716,8 @@ export default class PDFForm {
       page = this.doc.findPageForAnnotationRef(widgetRef);
 
       if (page === undefined) {
-        throw new Error(`Could not find page for PDFRef ${widgetRef}`);
+        //throw new Error(`Could not find page for PDFRef ${widgetRef}`);
+        return undefined;
       }
     }
 
